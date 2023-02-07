@@ -1,70 +1,68 @@
-const inputtdl = document.querySelector('.textarea')
-const buttontdl = document.querySelector('.buttoninput')
-const listtdl = document.querySelector('.todolist')
-var totalTask = 0;
-var completedTask = 0;
-function clickButton(e) {
-    e.preventDefault()
-    addTodo()
+const clear = document.querySelector(".clear");
+const list = document.getElementById("list");
+const input = document.getElementById("input");
+
+let LIST = [
+];
+
+let id = 0;
+
+const chk = "fa-check-circle";
+const unchk = "fa-circle-thin";
+
+function addToDo(toDo, id, done, trash){
+    if(!trash){
+        const DONE = done ? chk : unchk;
+        const item = `
+                <li class="item">
+                    <i class="fa ${DONE} co cir-it" job="complete" id="${id}"></i>
+                    <p class="text cir-it">${toDo}</p>
+                    <i class="fa fa-trash-o de" job="delete" id="${id}"></i>
+                </li>   
+                `;
+
+        const position = "beforeend";
+        list.insertAdjacentHTML(position, item);
+    }
 }
 
-let taskList = []
-
-
-// adding todoList
-function addTodo() {
-    const itemall = document.createElement('div')
-    itemall.classList.add('itemall')
-
-    const item = document.createElement('p')
-    item.classList.add('item')
-    item.innerText = inputtdl.value
-    itemall.appendChild(item)
-
-    if (inputtdl.value === '') return
-
-    const checkbutton = document.createElement("button")
-    checkbutton.innerHTML = '<i class="fa-solid fa-check"></i>'
-    checkbutton.classList.add("check-button")
-    itemall.appendChild(checkbutton)
-
-    const trashbutton = document.createElement("button")
-    trashbutton.innerHTML = '<i class="fa-solid fa-trash"></i>'
-    trashbutton.classList.add("trash-button")
-    itemall.appendChild(trashbutton)
-    listtdl.appendChild(itemall)
-    inputtdl.value = ''
-    totalTask++;
-    document.getElementById('totalTask').innerHTML = totalTask;
-    document.getElementById('activeTask').innerHTML = totalTask;
-}
-
-// checking and delete todoList 
-function okdel(e) {
-    const item = e.target
-    // check
-    if (item.classList[0] === 'check-button') {
-        const todolist = item.parentElement
-        todolist.classList.toggle('checklist')
-        completedTask++;
-        document.getElementById('activeTask').innerHTML = totalTask - completedTask;
-        if(completedTask <= totalTask)
-            document.getElementById('compTask').innerHTML = completedTask;
-        if((totalTask - completedTask) < 0) {
-            document.getElementById('activeTask').innerHTML = 0;
+document.addEventListener("keyup", function(event) {
+    if(event.key === "Enter") {
+        const toDo = input.value;
+        if(toDo) {
+            addToDo(toDo);
+            LIST.push({
+                name:toDo,
+                id:id,
+                done:false,
+                trash:false
+            });
+            id++;
         }
+        input.value = "";
     }
+});
 
-    // delete
-    if (item.classList[0] === 'trash-button') {
-        const todolist = item.parentElement
-        todolist.remove()
-        totalTask--;
-        document.getElementById('totalTask').innerHTML = totalTask;
-        if(totalTask === 0) 
-            document.getElementById(completedTask).innerHTML = 0;
-    }
+
+
+list.addEventListener("click", function(event) {
+    const element = event.target;
+    const elementJob = element.attributes.job.value;
+    if(elementJob === "complete")
+        completeToDo(element);
+    if(elementJob === "delete")
+        removeToDo(element);
+})
+
+
+function completeToDo(element) {
+    element.classList.toggle(chk);
+    element.classList.toggle(unchk);
+    LIST[element.id].done = LIST[element.id].done ? false : true;
 }
-buttontdl.addEventListener('click', clickButton)
-listtdl.addEventListener('click', okdel)
 
+
+function removeToDo(element) {
+    element.parentNode.parentNode.removeChild(element.parentNode);
+    LIST[element.id].trash = true;
+}
